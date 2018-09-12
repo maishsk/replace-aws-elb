@@ -1,5 +1,5 @@
 vpc_id: 1233
-vpc_cidr_block: 1.1.1.1/16
+vpc_cidr_block: 192.168.1.0/24
 region: us-east-2
 virtual_ip: 172.16.1.100
 instance_count: 2
