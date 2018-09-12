@@ -1,0 +1,5 @@
+galaxy_info:
+  author: Maish Saidel-Keesing
+  description: Create an Security Group
+  license: MIT
+  min_ansible_version: 2.6

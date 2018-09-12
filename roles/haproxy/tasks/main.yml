@@ -1,2 +1,110 @@
 ---
-# tasks file for haproxy
+- name: get unique ID
+  shell: curl -sf http://169.254.169.254/latest/meta-data/instance-id | cut -c14-
+  become: true
+  become_user: root
+  register: hostid
+
+- name: Create hostname fact
+  set_fact:
+    currenthostname: "{{stack_name}}{{component_stack_version}}-{{component_name}}-{{host_index}}"
+
+- name: Set the instance hostname
+  command: hostname "{{currenthostname | lower | regex_replace('_', '-') }}"
+
+- name: Remove SElinux
+  yum:
+    name: selinux*
+    state: absent
+
+- name: Install software
+  yum:
+    state: present
+    name:
+      - haproxy
+      - keepalived
+      - python-pip
+
+- name: Copy haproxy config
+  copy:
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install awscli
+  pip:
+    name: awscli
+
+- name: Create /root/.aws
+  file:
+    dest: /root/.aws
+    state: directory
+
+- name: Set index num
+  set_fact:
+    indexNum: 0
+  when: ansible_ec2_instance_id == "{{ node1 }}"
+
+- name: Set index num
+  set_fact:
+    indexNum: 1
+  when: ansible_ec2_instance_id == "{{ node2 }}"
+
+- name: Template out aws cli config
+  template:
+    src: config.j2
+    dest: /root/.aws/config
+    backup: yes
+
+- name: Template out creation of virtual network interface
+  template:
+    src: ifcfg-eth0_1.j2
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth0:1
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Restart network service
+  shell: service network restart; sleep 5
+
+- name: Template out keepalived MASTER config
+  template:
+    src: keepalived-master.j2
+    dest: /etc/keepalived/keepalived.conf
+    backup: yes
+  when: ansible_ec2_instance_id == "{{ node1 }}"
+
+- name: Template out keepalived BACKUP config
+  template:
+    src: keepalived-backup.j2
+    dest: /etc/keepalived/keepalived.conf
+    backup: yes
+  when: ansible_ec2_instance_id == "{{ node2 }}"
+
+- name: Template out keepalived master.sh
+  template:
+    src: master.sh.j2
+    dest: /etc/keepalived/master.sh
+    owner: root
+    group: root
+    mode: 0700
+    backup: yes
+
+- name: Setup haproxy logging
+  shell: |
+    echo "local2.*    /var/log/haproxy.log" > /etc/rsyslog.d/haproxy.conf
+    echo '$UDPServerAddress 127.0.0.1' >> /etc/rsyslog.conf
+    sed -i -e 's/#$ModLoad/$ModLoad/g' /etc/rsyslog.conf
+    sed -i -e 's/#$UDPServerRun/$UDPServerRun/g' /etc/rsyslog.conf
+
+- name: Start Services
+  service:
+    state: restarted
+    enabled: yes
+    name: "{{ item }}"
+  with_items:
+    - rsyslog
+    - keepalived
+    - haproxy

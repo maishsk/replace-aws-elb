@@ -1,0 +1,20 @@
+vpc_id: 1233
+vpc_cidr_block: 1.1.1.1/16
+region: us-east-2
+virtual_ip: 172.16.1.100
+instance_count: 2
+instance_type: t2.large
+use_public_ip: "no"
+network_to_use: "internal"
+master_slave: "true"
+source_dest_check_enabled: "no"
+iam_role: vrrp_Role
+volume_type: gp2
+root_disk_size: 50
+component_name: haproxy
+#### Security group rules for the component
+component_rules:
+  - proto: tcp
+    from_port: 1
+    to_port: 65535
+    cidr_ip: "{{ vpc_cidr_block }}"

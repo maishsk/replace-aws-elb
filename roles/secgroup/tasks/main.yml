@@ -1,0 +1,30 @@
+---
+- name: Build SG name without component name
+  when: component_name is defined
+  set_fact: sg_name="{{ component_name }}_SG"
+
+- name: Build SG description without stack_name
+  when: sg_description_with_stack_name is not defined
+  set_fact: sg_desc="{{ component_name }}"
+
+- name: Create Component Specfic SG
+  ec2_group:
+    name: "{{sg_name}}"
+    description: "Security group for {{ sg_desc }}"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    rules: "{{ component_rules }}"
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+    state: present
+  register: secgroup
+
+- name: Tag the security group with a name
+  local_action:
+    module: ec2_tag
+    resource: "{{ secgroup.group_id }}"
+    region: "{{ region }}"
+    state: present
+    tags:
+      Name: "{{ sg_name }}"

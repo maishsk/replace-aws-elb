@@ -1,2 +1,99 @@
 ---
-# tasks file for ec2
+
+- name: Randomize networks for DMZ
+  when: network_to_use == "dmz" and use_sticky_subnets is undefined
+  set_fact: randomize_networks="{{ dmz_subnet | shuffle }}"
+
+- name: Randomize networks for Internal
+  when: network_to_use == "internal" and use_sticky_subnets is undefined
+  set_fact: randomize_networks="{{ internal_subnet | shuffle }}"
+
+- name: Randomize networks for deployment
+  when: network_to_use == "vpn" and use_sticky_subnets is undefined
+  set_fact: randomize_networks="{{ vpn_subnet | shuffle }}"
+
+- name: Get subnet facts
+  ec2_vpc_subnet_facts:
+    region: "{{ region }}"
+    filters:
+      vpc-id: "{{ vpc_id }}"
+  register: subnet_facts
+
+- name: Deploy the required instances on the correct subnet
+  ec2:
+    region: "{{ region }}"
+    key_name: "{{ keypair }}"
+    image: "{{ image_name }}"
+    wait: yes
+    group_id: "{{ security_groups }}"
+    wait_timeout: 300
+    count: 1
+    monitoring: no
+    instance_profile_name: "{{ iam_role | default(omit) }}"
+    termination_protection: "{{ protect_termination | default(omit) }}"
+    vpc_subnet_id:  "{{ subnet_facts.results[(item|int) % (subnet_facts.results|length)].item }}"
+    assign_public_ip: "{{ use_public_ip | default("no") }}"
+    instance_type: "{{ instance_type }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: "{{ volume_type }}"
+        volume_size: "{{ root_disk_size }}"
+        delete_on_termination: True
+  register: ec2_instances
+  with_sequence: start=0 end={{ (instance_count|int) - 1 }}
+
+- name: Add tag to EC2 instances
+  ec2_tag:
+    region: '{{ region }}'
+    resource: "{{ ec2_instances.results[(item|int)].instances[0].id }}"
+    state: present
+    tags:
+      Name: "{{ component_name }}-{{ item }}"
+  with_sequence: start=0 end={{ ( instance_count | int ) - 1 }}
+
+- name: Get list of associated EBS volumes
+  ec2_vol:
+    instance: '{{ item.instances[0].id  }}'
+    state: list
+    region: '{{ region }}'
+  register: ec2_vol_out
+  with_items: "{{ ec2_instances.results }}"
+
+- name: Add tag to EBS Volume (root) /dev/sda1
+  ec2_tag:
+    region: '{{ region }}'
+    resource: "{{ item.volumes[0].id  }}"
+    state: present
+    tags:
+      Name: "{{ component_name }}-{{ item }}"
+  with_items: "{{ ec2_vol_out.results }}"
+
+- name: Add new instance to host group
+  add_host:
+    groupname: serversToInstall
+    hostname: "{{ ec2_instances.results[(item|int)].instances[0].private_ip }}"
+    host_index: "{{ ec2_instances.results[(item|int)].instances[0].placement }}-{{ item }}"
+  with_sequence: start=0 end={{ ( instance_count | int ) - 1 }}
+  register: ip2use
+
+- name: Wait for the instances to boot by checking the ssh port
+  wait_for:
+    port=22
+    delay=30
+    timeout=300
+    state=started
+    host = "{{ item.add_host.host_name }}"
+  with_items: "{{ ip2use.results }}"
+
+- name: Wait for 2 minute while the host really loads.
+  command: /bin/sleep 90
+
+- name: Register ids of ec2 to be used in elb if necessary
+  set_fact:
+    ec2_ids: "{{ ec2_ids }} + [ '{{ item.id }}' ]"
+  with_items: "{{ec2_instances.instances }}"
+
+- name: Register internal IPs of ec2 to be used later on if necessary
+  set_fact:
+    ec2_IPS: "{{ ec2_IPS }} + [ '{{ item.instances[0].private_ip }}' ]"
+  with_items: "{{ ec2_instances.results }}"

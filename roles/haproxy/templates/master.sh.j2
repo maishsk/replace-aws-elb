@@ -1,0 +1,10 @@
+#!/bin/bash
+CIDR_BLOCK={{ virtual_ip }}/32
+INSTANCE_ID={{ ansible_ec2_instance_id }}
+
+{% for item in rt_table_id %}
+aws ec2 replace-route --route-table-id {{ item }} --destination-cidr-block $CIDR_BLOCK --instance-id $INSTANCE_ID
+if [ `echo $?` -gt '0' ] ; then
+   aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block $CIDR_BLOCK --instance-id $INSTANCE_ID
+fi
+{% endfor %}
