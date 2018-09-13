@@ -27,7 +27,7 @@
     assign_public_ip: "{{ use_public_ip | default(no) }}"
     instance_type: "{{ instance_type }}"
     volumes:
-      - device_name: /dev/sda1
+      - device_name: /dev/xvda
         volume_type: "{{ volume_type }}"
         volume_size: "{{ root_disk_size }}"
         delete_on_termination: True
