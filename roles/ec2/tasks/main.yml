@@ -4,9 +4,13 @@
     region: "{{ region }}"
     filters:
       vpc-id: "{{ vpc_id }}"
-  register: subnet_facts
+  register: vpc_subnets
 
-- debug: var=subnet_facts.subnets[].id
+ - name: Set subnet_ids fact
+   set_fact:
+     subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list }}"
+
+- debug: var=subnet_ids
 
 - name: Randomize networks for DMZ
   when: network_to_use == "dmz" and use_sticky_subnets is undefined
