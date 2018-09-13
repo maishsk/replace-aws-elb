@@ -6,10 +6,17 @@
     state: present
     trust_policy: "{{ trust_policy }}"
 
-- name: Assign a policy to role
-  iam_policy:
-    iam_type: role
-    iam_name: "{{ iam_role }}"
+- name: Create IAM Managed Policy
+  iam_managed_policy:
     policy_name: "{{ iam_role }}_policy"
+    policy_description: "Policy to allow HAproxy to manage routes for high availability"
+    policy: "{{ lookup('file', '{{ policy_file }}') }}"
     state: present
-    policy_document: "{{ policy_file }}"
+
+# - name: Assign a policy to role
+#   iam_policy:
+#     iam_type: role
+#     iam_name: "{{ iam_role }}"
+#     policy_name: "{{ iam_role }}_policy"
+#     state: present
+#     policy_document: "{{ policy_file }}"
