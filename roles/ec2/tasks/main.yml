@@ -19,11 +19,11 @@
     wait: yes
     group_id: "{{ secgroup.group_id }}"
     wait_timeout: 300
-    count: "{{ instance_count | int }}"
+    count: "{{ ( instance_count | int ) - 1 }}"
     monitoring: no
     instance_profile_name: "{{ iam_role | default(omit) }}"
     termination_protection: "{{ protect_termination | default(omit) }}"
-    vpc_subnet_id:  "{{ subnet_ids }}"
+    vpc_subnet_id:  "{{ item }}"
     assign_public_ip: "{{ use_public_ip | default(no) }}"
     instance_type: "{{ instance_type }}"
     volumes:
@@ -32,7 +32,7 @@
         volume_size: "{{ root_disk_size }}"
         delete_on_termination: True
   register: ec2_instances
-  with_sequence: start=0 end={{ (instance_count|int) - 1 }}
+  with_items:  "{{ subnet_ids }}"
 
 - name: Add tag to EC2 instances
   ec2_tag:
