@@ -1,5 +1,6 @@
-vpc_id: 1233
-vpc_cidr_block: 192.168.1.0/24
+vpc_id: vpc-31721b59
+keypair: maishsk-keypair
+vpc_cidr_block: 192.168.100.0/24
 region: us-east-2
 virtual_ip: 172.16.1.100
 instance_count: 2
