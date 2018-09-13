@@ -9,6 +9,7 @@
   vars_files:
     - vars/vars.yml
   roles:
+    - iam_role
     - secgroup
     - ec2
 

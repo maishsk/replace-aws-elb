@@ -14,7 +14,16 @@ volume_type: gp2
 root_disk_size: 50
 component_name: haproxy
 image_id: ami-0b59bfac6be064b78
-
+# IAM policy for vrrp
+trust_policy:
+  Version: '2012-10-17'
+  Statement:
+  - Action:
+    - ec2:CreateRoute
+    - ec2:ReplaceRoute
+    Effect: Allow
+    Principal:
+      Service: *
 #### Security group rules for the component
 component_rules:
   - proto: tcp
