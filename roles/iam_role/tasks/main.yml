@@ -12,7 +12,8 @@
     policy_description: "Policy to allow HAproxy to manage routes for high availability"
     policy: "{{ lookup('file', '{{ policy_file }}') }}"
     state: present
-
+  register: iam_policy
+  
 # - name: Assign a policy to role
 #   iam_policy:
 #     iam_type: role
