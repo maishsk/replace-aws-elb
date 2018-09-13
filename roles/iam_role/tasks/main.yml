@@ -1,10 +1,10 @@
 ---
-- name: Create the iam role for the kubernetes master
+- name: Create the IAM role
   iam:
     iam_type: role
     name: "{{ iam_role }}"
     state: present
-    trust_policy:
+    trust_policy: "{{ trust_policy }}"
       Version: '2012-10-17'
       Statement:
         - Action: sts:AssumeRole
@@ -12,10 +12,10 @@
           Principal:
             Service: ec2.amazonaws.com
 
-# - name: Assign a policy called kubernetes-master to the kubernetes-master role
-#   iam_policy:
-#     iam_type: role
-#     iam_name: kubernetes-master
-#     policy_name: kubernetes-master
-#     state: present
-#     policy_document: "{{ role_path }}/files/kubernetes-master-policy.json"
+- name: Assign a policy to role
+  iam_policy:
+    iam_type: role
+    iam_name: "{{ iam_role }}"
+    policy_name: "{{ iam_role }}_policy"
+    state: present
+    policy_document: "{{ policy_file }}"
