@@ -1,11 +1,4 @@
 ---
-- name: Create the IAM role
-  iam:
-    iam_type: role
-    name: "{{ iam_role }}"
-    state: present
-    trust_policy: "{{ trust_policy }}"
-
 - name: Create IAM Managed Policy
   iam_managed_policy:
     policy_name: "{{ iam_role }}_policy"
@@ -14,7 +7,22 @@
     state: present
   register: iam_policy
 
-- debug: var=iam_policy  
+- name: Create a role and attach a managed policy
+  iam_role:
+    name: "{{ iam_role }}"
+    assume_role_policy_document: "{{ lookup('file','{{ trust_policy }}') }}"
+    managed_policy: "{{ iam_policy.policy.arn }}"
+    description: "Role to allow HAproxy instances to manage routes for high availability"
+
+# - name: Create the IAM role
+#   iam:
+#     iam_type: role
+#     name: "{{ iam_role }}"
+#     state: present
+#     trust_policy: "{{ trust_policy }}"
+#
+#
+# - debug: var=iam_policy
 # - name: Assign a policy to role
 #   iam_policy:
 #     iam_type: role
