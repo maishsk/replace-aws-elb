@@ -9,23 +9,12 @@
 
 - name: Set subnet_ids fact
   set_fact:
-    subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list }}"
+    subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list | shuffle }}"
 
-- debug: var=subnet_ids
+- name: Randomize networks f
+  set_fact: network_to_use == "{{ internal_subnet | shuffle }}"
 
-- name: Randomize networks for DMZ
-  when: network_to_use == "dmz" and use_sticky_subnets is undefined
-  set_fact: randomize_networks="{{ dmz_subnet | shuffle }}"
-
-- name: Randomize networks for Internal
-  when: network_to_use == "internal" and use_sticky_subnets is undefined
-  set_fact: randomize_networks="{{ internal_subnet | shuffle }}"
-
-- name: Randomize networks for deployment
-  when: network_to_use == "vpn" and use_sticky_subnets is undefined
-  set_fact: randomize_networks="{{ vpn_subnet | shuffle }}"
-
-- name: Deploy the required instances on the correct subnet
+- name: Deploy the required instances on the correct subnets
   ec2:
     region: "{{ region }}"
     key_name: "{{ keypair }}"
@@ -33,11 +22,11 @@
     wait: yes
     group_id: "{{ security_groups }}"
     wait_timeout: 300
-    count: 1
+    count: "{{ instance_count | int }}"
     monitoring: no
     instance_profile_name: "{{ iam_role | default(omit) }}"
     termination_protection: "{{ protect_termination | default(omit) }}"
-    vpc_subnet_id:  "{{ subnet_facts.results[(item|int) % (subnet_facts.results|length)].item }}"
+    vpc_subnet_id:  "{{ subnet_ids }}"
     assign_public_ip: "{{ use_public_ip | default(no) }}"
     instance_type: "{{ instance_type }}"
     volumes:
