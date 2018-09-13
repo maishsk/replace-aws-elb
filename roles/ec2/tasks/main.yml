@@ -6,7 +6,7 @@
       vpc-id: "{{ vpc_id }}"
   register: subnet_facts
 
-- debug: var=subnet_facts
+- debug: var=subnet_facts.subnets[].id
 
 - name: Randomize networks for DMZ
   when: network_to_use == "dmz" and use_sticky_subnets is undefined
