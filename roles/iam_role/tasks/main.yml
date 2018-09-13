@@ -13,7 +13,8 @@
     policy: "{{ lookup('file', '{{ policy_file }}') }}"
     state: present
   register: iam_policy
-  
+
+- debug: var=iam_policy  
 # - name: Assign a policy to role
 #   iam_policy:
 #     iam_type: role
