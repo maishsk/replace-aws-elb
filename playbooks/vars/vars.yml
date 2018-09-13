@@ -18,14 +18,7 @@ policy_file: "./files/vrrp_policy.json"
 trust_policy: "./files/trust_policy.json"
 policyDescription: "Policy to allow HAproxy to manage routes for high availability"
 role_description: "Role to allow HAproxy instances to manage routes for high availability"
-# IAM policy for vrrp
-trust_policy:
-  Version: '2012-10-17'
-  Statement:
-    - Action: sts:AssumeRole
-      Effect: Allow
-      Principal:
-        Service: ec2.amazonaws.com
+
 #### Security group rules for the component
 component_rules:
   - proto: tcp
