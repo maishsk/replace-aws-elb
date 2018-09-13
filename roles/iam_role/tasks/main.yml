@@ -10,7 +10,7 @@
 - name: Create a role and attach a managed policy
   iam_role:
     name: "{{ iam_role }}"
-    assume_role_policy_document: "{{ lookup('file','{{ trust_policy }}') }}"
+    assume_role_policy_document: "{{ lookup('file','trust_policy.json') }}"
     managed_policy: "{{ iam_policy.policy.arn }}"
     description: "Role to allow HAproxy instances to manage routes for high availability"
 
