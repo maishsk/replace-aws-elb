@@ -11,9 +11,6 @@
   set_fact:
     subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list | shuffle }}"
 
-- name: Randomize networks f
-  set_fact: network_to_use == "{{ internal_subnet | shuffle }}"
-
 - name: Deploy the required instances on the correct subnets
   ec2:
     region: "{{ region }}"
