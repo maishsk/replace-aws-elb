@@ -15,7 +15,7 @@
   ec2:
     region: "{{ region }}"
     key_name: "{{ keypair }}"
-    image: "{{ image_name }}"
+    image: "{{ image_id }}"
     wait: yes
     group_id: "{{ secgroup.group_id }}"
     wait_timeout: 300
