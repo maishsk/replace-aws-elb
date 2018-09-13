@@ -17,7 +17,7 @@
     key_name: "{{ keypair }}"
     image: "{{ image_name }}"
     wait: yes
-    group_id: "{{ security_groups }}"
+    group_id: "{{ secgroup.group_id }}"
     wait_timeout: 300
     count: "{{ instance_count | int }}"
     monitoring: no
