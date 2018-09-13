@@ -4,11 +4,12 @@
     region: "{{ region }}"
     filters:
       vpc-id: "{{ vpc_id }}"
+      "tag:Name": 'Private*'
   register: vpc_subnets
 
- - name: Set subnet_ids fact
-   set_fact:
-     subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list }}"
+- name: Set subnet_ids fact
+  set_fact:
+    subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list }}"
 
 - debug: var=subnet_ids
 
