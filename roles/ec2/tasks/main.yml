@@ -1,5 +1,4 @@
 ---
-
 - name: Randomize networks for DMZ
   when: network_to_use == "dmz" and use_sticky_subnets is undefined
   set_fact: randomize_networks="{{ dmz_subnet | shuffle }}"
@@ -32,7 +31,7 @@
     instance_profile_name: "{{ iam_role | default(omit) }}"
     termination_protection: "{{ protect_termination | default(omit) }}"
     vpc_subnet_id:  "{{ subnet_facts.results[(item|int) % (subnet_facts.results|length)].item }}"
-    assign_public_ip: "{{ use_public_ip | default("no") }}"
+    assign_public_ip: "{{ use_public_ip | default(no) }}"
     instance_type: "{{ instance_type }}"
     volumes:
       - device_name: /dev/sda1
