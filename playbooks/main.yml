@@ -59,7 +59,5 @@
     node1_ip: "{{ hostvars['localhost']['node1ip'] }}"
     node2_ip: "{{ hostvars['localhost']['node2ip'] }}"
     rt_table_id: "{{ hostvars['localhost']['route_table_ids']}}"
-  vars_files:
-    - vars/haproxy-internal_vars_toplevel.yml
   roles:
     - haproxy
