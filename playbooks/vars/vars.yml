@@ -22,7 +22,8 @@ trust_policy:
     - ec2:CreateRoute
     - ec2:ReplaceRoute
     Effect: Allow
-    Resource: "*"
+    Principal:
+      Service: "*"
 #### Security group rules for the component
 component_rules:
   - proto: tcp
