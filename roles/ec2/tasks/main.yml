@@ -1,4 +1,13 @@
 ---
+- name: Get subnet facts
+  ec2_vpc_subnet_facts:
+    region: "{{ region }}"
+    filters:
+      vpc-id: "{{ vpc_id }}"
+  register: subnet_facts
+
+- debug: var=subnet_facts
+
 - name: Randomize networks for DMZ
   when: network_to_use == "dmz" and use_sticky_subnets is undefined
   set_fact: randomize_networks="{{ dmz_subnet | shuffle }}"
@@ -10,13 +19,6 @@
 - name: Randomize networks for deployment
   when: network_to_use == "vpn" and use_sticky_subnets is undefined
   set_fact: randomize_networks="{{ vpn_subnet | shuffle }}"
-
-- name: Get subnet facts
-  ec2_vpc_subnet_facts:
-    region: "{{ region }}"
-    filters:
-      vpc-id: "{{ vpc_id }}"
-  register: subnet_facts
 
 - name: Deploy the required instances on the correct subnet
   ec2:
