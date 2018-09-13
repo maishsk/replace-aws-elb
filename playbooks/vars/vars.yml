@@ -13,6 +13,8 @@ iam_role: vrrp_Role
 volume_type: gp2
 root_disk_size: 50
 component_name: haproxy
+image_id: ami-0b59bfac6be064b78
+
 #### Security group rules for the component
 component_rules:
   - proto: tcp
