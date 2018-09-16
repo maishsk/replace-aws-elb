@@ -44,7 +44,7 @@
       with_items: "{{ route_table_ids }}"
 
 - name: Configure nodes
-  hosts: serversToInstall
+  hosts: ec2_hosts
   user: centos
   become: yes
   become_method: sudo
@@ -54,7 +54,6 @@
   vars:
     component_name: "{{ hostvars['localhost']['component_name'] }}"
     vip: "{{ hostvars['localhost']['vip'] }}"
-    label: "{{ component_name.split('-')[1] }}"
     node1: "{{ hostvars['localhost']['node1'] }}"
     node2: "{{ hostvars['localhost']['node2'] }}"
     node1_ip: "{{ hostvars['localhost']['node1ip'] }}"
