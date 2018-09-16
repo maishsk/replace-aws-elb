@@ -51,43 +51,43 @@
   register: ec2_vol_out
   with_items: "{{ ec2_instances.results }}"
 
-- debug: var=ec2_vol_out.results[].volumes[]
+- debug: var=ec2_vol_out.results
 
-- name: Add tag to EBS Volume (root) /dev/xvda
-  ec2_tag:
-    region: "{{ region }}"
-    resource: "{{ item.volumes[0].id  }}"
-    state: present
-    tags:
-      Name: "{{ component_name }}-{{ item }}"
-  with_items: "{{ ec2_vol_out.results[].volumes[].id }}"
-
-- name: Add new instance to host group
-  add_host:
-    groupname: serversToInstall
-    hostname: "{{ ec2_instances.results[(item|int)].instances[0].private_ip }}"
-    host_index: "{{ ec2_instances.results[(item|int)].instances[0].placement }}-{{ item }}"
-  with_sequence: start=0 end={{ ( instance_count | int ) - 1 }}
-  register: ip2use
-
-- name: Wait for the instances to boot by checking the ssh port
-  wait_for:
-    port=22
-    delay=30
-    timeout=300
-    state=started
-    host = "{{ item.add_host.host_name }}"
-  with_items: "{{ ip2use.results }}"
-
-- name: Wait for 2 minute while the host really loads.
-  command: /bin/sleep 90
-
-- name: Register ids of ec2 to be used in elb if necessary
-  set_fact:
-    ec2_ids: "{{ ec2_ids }} + [ '{{ item.id }}' ]"
-  with_items: "{{ec2_instances.instances }}"
-
-- name: Register internal IPs of ec2 to be used later on if necessary
-  set_fact:
-    ec2_IPS: "{{ ec2_IPS }} + [ '{{ item.instances[0].private_ip }}' ]"
-  with_items: "{{ ec2_instances.results }}"
+# - name: Add tag to EBS Volume (root) /dev/xvda
+#   ec2_tag:
+#     region: "{{ region }}"
+#     resource: "{{ item.volumes[0].id  }}"
+#     state: present
+#     tags:
+#       Name: "{{ component_name }}-{{ item }}"
+#   with_items: "{{ ec2_vol_out.results[].volumes[].id }}"
+#
+# - name: Add new instance to host group
+#   add_host:
+#     groupname: serversToInstall
+#     hostname: "{{ ec2_instances.results[(item|int)].instances[0].private_ip }}"
+#     host_index: "{{ ec2_instances.results[(item|int)].instances[0].placement }}-{{ item }}"
+#   with_sequence: start=0 end={{ ( instance_count | int ) - 1 }}
+#   register: ip2use
+#
+# - name: Wait for the instances to boot by checking the ssh port
+#   wait_for:
+#     port=22
+#     delay=30
+#     timeout=300
+#     state=started
+#     host = "{{ item.add_host.host_name }}"
+#   with_items: "{{ ip2use.results }}"
+#
+# - name: Wait for 2 minute while the host really loads.
+#   command: /bin/sleep 90
+#
+# - name: Register ids of ec2 to be used in elb if necessary
+#   set_fact:
+#     ec2_ids: "{{ ec2_ids }} + [ '{{ item.id }}' ]"
+#   with_items: "{{ec2_instances.instances }}"
+#
+# - name: Register internal IPs of ec2 to be used later on if necessary
+#   set_fact:
+#     ec2_IPS: "{{ ec2_IPS }} + [ '{{ item.instances[0].private_ip }}' ]"
+#   with_items: "{{ ec2_instances.results }}"
