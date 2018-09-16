@@ -62,6 +62,7 @@
 #       Name: "{{ component_name }}-{{ item }}"
 #   with_items: "{{ ec2_vol_out.results[].volumes[].id }}"
 #
+- debug: var=ec2_instances
 - name: Add new instance to host group
   add_host:
     groupname: ec2_hosts
@@ -79,13 +80,13 @@
     host = "{{ item.add_host.host_name }}"
   with_items: "{{ ip2use.results }}"
 
-- name: Wait for 2 minute while the host really loads.
-  command: /bin/sleep 90
+- name: Wait a bit while the instance actually comes up.
+  command: /bin/sleep 60
 
 - name: Register ids of ec2 to be used in elb if necessary
   set_fact:
     ec2_ids: "{{ ec2_ids }} + [ '{{ item.id }}' ]"
-  with_items: "{{ec2_instances.instances }}"
+  with_items: "{{ec2_instances.results }}"
 
 - name: Register internal IPs of ec2 to be used later on if necessary
   set_fact:
