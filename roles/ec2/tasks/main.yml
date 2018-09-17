@@ -83,7 +83,8 @@
 # - name: Wait a bit while the instance actually comes up.
 #   command: /bin/sleep 60
 
-- debug: var=ec2_instances.results
+- debug: var=ec2_instances.results[].instances
+- debug: var=ec2_instances.results[].instance_ids
 
 - name: Register ids of ec2 to be used in elb if necessary
   set_fact:
