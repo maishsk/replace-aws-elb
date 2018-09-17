@@ -18,14 +18,16 @@
   connection: local
   tasks:
     - set_fact:
-        node1: "{{ ec2_ids.0 }}"
-        node2: "{{ ec2_ids.1 }}"
-        node1_ip: "{{ ec2_IPS.0 }}"
-        node2_ip: "{{ ec2_IPS.1 }}"
+        node0: "{{ ec2_ids.0 }}"
+        node1: "{{ ec2_ids.1 }}"
+        node0_ip: "{{ ec2_IPS.0 }}"
+        node1_ip: "{{ ec2_IPS.1 }}"
 
 - name: Section - Routing
   hosts: localhost
   connection: local
+  vars_files:
+    - vars/vars.yml
   tasks:
     - name: Get Route table facts
       ec2_vpc_route_table_facts:
@@ -37,15 +39,15 @@
 
     - name: Store route tables for future use
       set_fact:
-        route_table_ids="{{ vpc_rt_facts|json_query('route_tables[*].id')}}"
+        route_table_ids="{{ vpc_rt_facts|json_query('route_tables[*].id') }}"
 
     - name: Create Route for VIP
-      shell: "aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node1 }}"
+      shell: "aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
       with_items: "{{ route_table_ids }}"
 
 - name: Configure nodes
   hosts: ec2_hosts
-  user: centos
+  user: ec2-user
   become: yes
   become_method: sudo
   gather_facts: true
@@ -53,11 +55,11 @@
     - vars/vars.yml
   vars:
     component_name: "{{ hostvars['localhost']['component_name'] }}"
-    vip: "{{ hostvars['localhost']['vip'] }}"
+    virtual_ip: "{{ hostvars['localhost']['virtual_ip'] }}"
+    node0: "{{ hostvars['localhost']['node0'] }}"
     node1: "{{ hostvars['localhost']['node1'] }}"
-    node2: "{{ hostvars['localhost']['node2'] }}"
-    node1_ip: "{{ hostvars['localhost']['node1ip'] }}"
-    node2_ip: "{{ hostvars['localhost']['node2ip'] }}"
+    node0_ip: "{{ hostvars['localhost']['node0_ip'] }}"
+    node1_ip: "{{ hostvars['localhost']['node1_ip'] }}"
     rt_table_id: "{{ hostvars['localhost']['route_table_ids']}}"
   roles:
     - haproxy
