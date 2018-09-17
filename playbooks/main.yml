@@ -42,7 +42,14 @@
         route_table_ids="{{ vpc_rt_facts|json_query('route_tables[*].id') }}"
 
     - name: Create Route for VIP
-      shell: "aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
+      shell: |
+        "aws ec2 describe-route --route-table-id {{ item }} | grep  {{ virtual_ip }}"
+        if [ $? -eq 0 ]
+          "aws ec2 delete-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32"
+          "aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
+        else
+          "aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
+        fi
       with_items: "{{ route_table_ids }}"
 
 - name: Configure nodes
