@@ -1,6 +1,6 @@
 ---
-- name: get unique ID
-  shell: curl -sf http://169.254.169.254/latest/meta-data/instance-id | cut -c14-
+- name: get Instance ID
+  shell: curl -sf http://169.254.169.254/latest/meta-data/instance-id
   become: true
   become_user: root
   register: hostid
@@ -10,7 +10,7 @@
     currenthostname: "{{ component_name }}-{{ host_index }}"
 
 - name: Set the instance hostname
-  command: hostname "{{ currenthostname | lower | regex_replace('_', '-') }}"
+  command: hostname "{{ currenthostname | lower }}"
 
 - name: Remove SElinux
   yum:
@@ -64,14 +64,14 @@
     src: keepalived-master.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: ansible_ec2_instance_id == "{{ node0 }}"
+  when: hostid == "{{ node0 }}"
 
 - name: Template out keepalived BACKUP config
   template:
     src: keepalived-backup.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: ansible_ec2_instance_id == "{{ node1 }}"
+  when: hostid == "{{ node1 }}"
 
 - name: Template out keepalived master.sh
   template:
