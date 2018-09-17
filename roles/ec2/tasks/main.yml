@@ -87,7 +87,7 @@
 
 - name: Register instance IDs of ec2 instances
   set_fact:
-    ec2_ids: "{{ ec2_instances.results | map(attribute='instance_ids') }}"
+    ec2_ids: "{{ ec2_instances.results | map(attribute='instance_ids') | list }}"
 - debug: var=ec2_ids
 
 - name: Register internal IPs of ec2 to be used later on if necessary
