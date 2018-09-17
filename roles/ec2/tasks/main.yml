@@ -84,7 +84,7 @@
 #   command: /bin/sleep 60
 
 - name: debug ec2_instances
-  register: ec2_instances
+  debug: ec2_instances
 
 - name: Register ids of ec2 to be used in elb if necessary
   set_fact:
