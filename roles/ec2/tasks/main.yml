@@ -7,7 +7,7 @@
       "tag:Name": "Private*"
   register: vpc_subnets
 
-- debug: vpc_subnets
+- debug: var=vpc_subnets
 
 - name: Set subnet_ids fact
   set_fact:
