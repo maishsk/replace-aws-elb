@@ -7,7 +7,7 @@
 
 - name: Create hostname fact
   set_fact:
-    currenthostname: "{{stack_name}}{{component_stack_version}}-{{component_name}}-{{host_index}}"
+    currenthostname: "{{ component_name }}-{{ host_index }}"
 
 - name: Set the instance hostname
   command: hostname "{{currenthostname | lower | regex_replace('_', '-') }}"
@@ -45,12 +45,12 @@
 - name: Set index num
   set_fact:
     indexNum: 0
-  when: ansible_ec2_instance_id == "{{ node1 }}"
+  when: ansible_ec2_instance_id == "{{ node0 }}"
 
 - name: Set index num
   set_fact:
     indexNum: 1
-  when: ansible_ec2_instance_id == "{{ node2 }}"
+  when: ansible_ec2_instance_id == "{{ node1 }}"
 
 - name: Template out aws cli config
   template:
@@ -74,14 +74,14 @@
     src: keepalived-master.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: ansible_ec2_instance_id == "{{ node1 }}"
+  when: ansible_ec2_instance_id == "{{ node0 }}"
 
 - name: Template out keepalived BACKUP config
   template:
     src: keepalived-backup.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: ansible_ec2_instance_id == "{{ node2 }}"
+  when: ansible_ec2_instance_id == "{{ node1 }}"
 
 - name: Template out keepalived master.sh
   template:
