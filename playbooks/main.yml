@@ -44,7 +44,7 @@
     - name: Create Route for VIP
       shell: |
         "aws ec2 describe-route --route-table-id {{ item }} | grep  {{ virtual_ip }}"
-        if [ $? -eq 0 ]
+        if [ $? -eq 0 ]; then
           "aws ec2 delete-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32"
           "aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
         else
