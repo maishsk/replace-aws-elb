@@ -83,11 +83,8 @@
 # - name: Wait a bit while the instance actually comes up.
 #   command: /bin/sleep 60
 
-- debug:
-    msg: "ec2_ids {{ ec2_instances.results}}"
+- debug: var=ec2_instances.results
 
-- debug:
-    msg: "ec2_ids {{ ec2_instances.results | map(attribute='instance_ids') }}"
 - name: Register ids of ec2 to be used in elb if necessary
   set_fact:
     ec2_ids: "{{ ec2_instances.results | map(attribute='instance_ids') }}"
