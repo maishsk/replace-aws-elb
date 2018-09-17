@@ -43,13 +43,14 @@
 
     - name: Create Route for VIP
       shell: |
-        "/usr/bin/aws ec2 describe-route --route-table-id {{ item }} | grep  {{ virtual_ip }}"
-        if [ $? -eq 0 ]; then
-          "/usr/bin/aws ec2 delete-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32"
-          "/usr/bin/aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
-        else
-          "/usr/bin/aws create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
-        fi
+        # "/usr/bin/aws ec2 describe-route --route-table-id {{ item }} | grep  {{ virtual_ip }}"
+        # if [ $? -eq 0 ]; then
+        #   "/usr/bin/aws ec2 delete-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32"
+        #   "/usr/bin/aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
+        # else
+        #   "/usr/bin/aws create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}"
+        # fi
+        printenv
       with_items: "{{ route_table_ids }}"
 
 - name: Configure nodes
