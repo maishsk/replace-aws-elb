@@ -7,6 +7,8 @@
       "tag:Name": "Private*"
   register: vpc_subnets
 
+- debug: vpc_subnets
+
 - name: Set subnet_ids fact
   set_fact:
     subnet_ids: "{{ vpc_subnets.subnets | map(attribute='id') | list | shuffle }}"
@@ -92,6 +94,6 @@
 
 - name: Register internal IPs of ec2 instances
   set_fact:
-    ec2_IPS: "{{ (ec2_instances | from_json).results.instances | map(attribute='private_ip') | list }}"
+    ec2_IPS: "{{ (ec2_instances | from_json).results | map(attribute='instances.private_ip') | list }}"
 
 - debug: var=ec2_IPS
