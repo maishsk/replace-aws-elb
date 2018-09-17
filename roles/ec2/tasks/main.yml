@@ -80,7 +80,7 @@
   with_items: "{{ ip2use.results }}"
 
 - name: Wait a bit while the instance actually comes up.
-  command: /bin/sleep 60
+  command: /bin/sleep 30
 
 - name: Set default empty list
   set_fact: ec2_ids=[]
