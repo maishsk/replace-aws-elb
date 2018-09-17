@@ -10,7 +10,7 @@
     currenthostname: "{{ component_name }}-{{ host_index }}"
 
 - name: Set the instance hostname
-  command: hostname "{{currenthostname | lower | regex_replace('_', '-') }}"
+  command: hostname "{{ currenthostname | lower | regex_replace('_', '-') }}"
 
 - name: Remove SElinux
   yum:
@@ -41,16 +41,6 @@
   file:
     dest: /root/.aws
     state: directory
-
-- name: Set index num
-  set_fact:
-    indexNum: 0
-  when: ansible_ec2_instance_id == "{{ node0 }}"
-
-- name: Set index num
-  set_fact:
-    indexNum: 1
-  when: ansible_ec2_instance_id == "{{ node1 }}"
 
 - name: Template out aws cli config
   template:
