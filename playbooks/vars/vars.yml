@@ -2,7 +2,7 @@ vpc_id: vpc-31721b59
 keypair: maishsk-keypair
 vpc_cidr_block: 192.168.100.0/24
 region: us-east-2
-virtual_ip: 172.16.1.100
+virtual_ip: 192.168.55.100
 instance_count: 2
 instance_type: t2.large
 use_public_ip: "no"
@@ -13,6 +13,12 @@ iam_role: vrrp_Role
 volume_type: gp2
 root_disk_size: 50
 component_name: haproxy
+image_id: ami-0b59bfac6be064b78
+policy_file: "./files/vrrp_policy.json"
+trust_policy: "./files/trust_policy.json"
+policyDescription: "Policy to allow HAproxy to manage routes for high availability"
+role_description: "Role to allow HAproxy instances to manage routes for high availability"
+
 #### Security group rules for the component
 component_rules:
   - proto: tcp

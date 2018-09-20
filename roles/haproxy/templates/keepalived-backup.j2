@@ -9,9 +9,9 @@ vrrp_instance VI_1 {
 	state BACKUP
 	virtual_router_id 1 								# Assign one ID for this route
 	priority 100 												# 101 on master, 100 on backup
-	unicast_src_ip {{ node2_ip }} 			# My IP
+	unicast_src_ip {{ node1_ip }} 			# My IP
 	unicast_peer {
-		{{ node1_ip }} 										# peer IP
+		{{ node0_ip }} 										# peer IP
 	}
 	track_script {
 		chk_haproxy

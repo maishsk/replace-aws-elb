@@ -1,16 +1,16 @@
 ---
-- name: get unique ID
-  shell: curl -sf http://169.254.169.254/latest/meta-data/instance-id | cut -c14-
+- name: get Instance ID
+  shell: curl -sf http://169.254.169.254/latest/meta-data/instance-id
   become: true
   become_user: root
   register: hostid
 
 - name: Create hostname fact
   set_fact:
-    currenthostname: "{{stack_name}}{{component_stack_version}}-{{component_name}}-{{host_index}}"
+    currenthostname: "{{ component_name }}-{{ host_index }}"
 
 - name: Set the instance hostname
-  command: hostname "{{currenthostname | lower | regex_replace('_', '-') }}"
+  command: hostname "{{ currenthostname | lower }}"
 
 - name: Remove SElinux
   yum:
@@ -42,16 +42,6 @@
     dest: /root/.aws
     state: directory
 
-- name: Set index num
-  set_fact:
-    indexNum: 0
-  when: ansible_ec2_instance_id == "{{ node1 }}"
-
-- name: Set index num
-  set_fact:
-    indexNum: 1
-  when: ansible_ec2_instance_id == "{{ node2 }}"
-
 - name: Template out aws cli config
   template:
     src: config.j2
@@ -69,19 +59,20 @@
 - name: Restart network service
   shell: service network restart; sleep 5
 
+- debug: var=host_index
 - name: Template out keepalived MASTER config
   template:
     src: keepalived-master.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: ansible_ec2_instance_id == "{{ node1 }}"
+  when: host_index == "0"
 
 - name: Template out keepalived BACKUP config
   template:
     src: keepalived-backup.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: ansible_ec2_instance_id == "{{ node2 }}"
+  when: host_index == "1"
 
 - name: Template out keepalived master.sh
   template:
