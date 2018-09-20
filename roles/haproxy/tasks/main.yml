@@ -65,14 +65,14 @@
     src: keepalived-master.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: host_index == 0
+  when: host_index == "0"
 
 - name: Template out keepalived BACKUP config
   template:
     src: keepalived-backup.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: host_index == 1
+  when: host_index == "1"
 
 - name: Template out keepalived master.sh
   template:
