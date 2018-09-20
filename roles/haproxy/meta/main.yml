@@ -1,5 +1,5 @@
 galaxy_info:
   author: Maish Saidel-Keesing
-  description: Deploy HAproxy software
+  description: Deploy HAproxy & Keepalived software
   license: MIT
   min_ansible_version: 2.6
