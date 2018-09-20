@@ -48,7 +48,7 @@
           /usr/bin/aws ec2 delete-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32
           /usr/bin/aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}
         else
-          /usr/bin/aws create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}
+          /usr/bin/aws ec2 create-route --route-table-id {{ item }} --destination-cidr-block {{ virtual_ip }}/32 --instance-id {{ node0 }}
         fi
       with_items: "{{ route_table_ids }}"
 
