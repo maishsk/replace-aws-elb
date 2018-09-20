@@ -59,19 +59,20 @@
 - name: Restart network service
   shell: service network restart; sleep 5
 
+- debug: var=host_index
 - name: Template out keepalived MASTER config
   template:
     src: keepalived-master.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: hostid == "{{ node0 }}"
+  when: host_index == 0
 
 - name: Template out keepalived BACKUP config
   template:
     src: keepalived-backup.j2
     dest: /etc/keepalived/keepalived.conf
     backup: yes
-  when: hostid == "{{ node1 }}"
+  when: host_index == 1
 
 - name: Template out keepalived master.sh
   template:
