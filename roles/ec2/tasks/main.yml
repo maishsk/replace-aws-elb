@@ -25,6 +25,7 @@
     termination_protection: "{{ protect_termination | default(omit) }}"
     vpc_subnet_id:  "{{ item }}"
     assign_public_ip: "{{ use_public_ip | default(no) }}"
+    source_dest_check: "{{ source_dest_check_enabled | default(omit) }}"
     instance_type: "{{ instance_type }}"
     volumes:
       - device_name: /dev/xvda
