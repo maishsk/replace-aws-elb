@@ -6,8 +6,6 @@ virtual_ip: 192.168.55.100
 instance_count: 2
 instance_type: t2.large
 use_public_ip: "no"
-network_to_use: "internal"
-master_slave: "true"
 source_dest_check_enabled: "no"
 iam_role: vrrp_Role
 volume_type: gp2
