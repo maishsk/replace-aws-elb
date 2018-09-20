@@ -1,10 +1,4 @@
 ---
-- name: get Instance ID
-  shell: curl -sf http://169.254.169.254/latest/meta-data/instance-id
-  become: true
-  become_user: root
-  register: hostid
-
 - name: Create hostname fact
   set_fact:
     currenthostname: "{{ component_name }}-{{ host_index }}"
