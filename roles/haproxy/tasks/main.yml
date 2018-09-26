@@ -59,7 +59,6 @@
 - name: Restart network service
   shell: service network restart; sleep 5
 
-- debug: var=host_index
 - name: Template out keepalived MASTER config
   template:
     src: keepalived-master.j2
